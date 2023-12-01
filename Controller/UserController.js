@@ -1,11 +1,11 @@
 const express = require('express');
-const UserModel = require('../Models/userModel');
+const UserModel = require('../Models/UserModel');
 const router = express.Router()
 
 
 module.exports.getallUsers = async (req, res, next) => {
     try {
-     
+     console.log("in")
       // Parse the query parameters for pagination
       const page = parseInt(req.query.page) || 1;
       const limit = parseInt(req.query.limit) || 10; // Default limit is 10
@@ -17,6 +17,7 @@ module.exports.getallUsers = async (req, res, next) => {
       const user= await UserModel.find().skip(skip).limit(limit);
   
       // Send the paginated response back to the client
+      console.log(user)
       res.json({ status: "success", result: user });
     } catch (error) {
       res.status(400).json({ status: "error", message: error.message });

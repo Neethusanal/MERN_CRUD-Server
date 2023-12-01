@@ -22,7 +22,7 @@ app.use(cors({
   method: ['GET', 'POST', 'DELETE', 'PUT'],
   credentials: true,
 }));
-
+app.use('/', userRoutes);
 app.listen(4000, () => {
     console.log("Server/Backend started on port 4000");
   });
