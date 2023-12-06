@@ -17,9 +17,39 @@ module.exports.getallUsers = async (req, res, next) => {
       const user= await UserModel.find().skip(skip).limit(limit);
   
       // Send the paginated response back to the client
-      console.log(user)
+      //console.log(user)
       res.json({ status: "success", result: user });
     } catch (error) {
       res.status(400).json({ status: "error", message: error.message });
     }
   };
+
+  module.exports.editUser =async(req,res)=>{
+    try{
+      console.log("here came")
+      console.log(req.body,"ggg")
+      
+   UserModel.updateOne({id:req.body.id},{
+           $set:{
+               first_name:req.body.firstname,
+               last_name:req.body.lastname,
+               email:req.body.email,
+               gender:req.body.gender,
+               domain:req.body.domain,
+               avatar:req.body.avatar
+
+           }
+
+
+       }).then((response)=>{
+           console.log(response,"waszxdcfgvh")
+           res.json({ message: "User data updated succesfully", status: true });
+
+       })
+
+   }
+   catch(err)
+   {
+       res.json({ message: "Some thing went wrong", status: false })
+   }
+  }

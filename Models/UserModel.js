@@ -8,6 +8,7 @@ const UserSchema = new mongoose.Schema({
   avatar:     { type: String, required: true },
   domain:     { type: String, required: true },
   available:  { type: Boolean, required: true },
+  deleted:    { type: Boolean, default: false }, 
 });
 const UserModel = mongoose.model('User', UserSchema);
 
