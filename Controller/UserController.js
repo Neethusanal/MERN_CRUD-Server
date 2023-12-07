@@ -1,6 +1,45 @@
 const express = require('express');
 const UserModel = require('../Models/UserModel');
+const LoginModel=require('../Models/LoginModel')
 const router = express.Router()
+const jwt = require("jsonwebtoken");
+const bcrypt = require("bcrypt");
+const maxAge = 3 * 24 * 60 * 60;
+
+module.exports.login=async(req,res)=>{
+  try{
+   let {email,password}=req.body
+   console.log(email,password)
+   let logindata=await LoginModel.findOne({email:email})
+   //console.log(logindata,"ggg")
+   if(logindata)
+   {
+     let validPassword = await bcrypt.compare(password, logindata.password);
+      console.log(validPassword)
+      if (validPassword) {
+       const loginId = logindata._id;
+       const token = jwt.sign({ loginId }, process.env.JWT_SECRET_KEY, {
+         expiresIn: maxAge
+       });
+       
+       console.log(token)
+       res
+         .status(200)
+         .json({ message: "Login Successfull", logindata, token, success: true });
+     } else {
+       const errors = { message: "Incorrect  password" };
+       res.json({ errors, success: false });
+     }
+   } else {
+     const errors = { message: "email does not exist" };
+     res.json({ errors, success: false });
+   }
+ } catch (error) {
+   res.json({message: error.message, success: false });
+   
+ }
+};
+ 
 
 
 module.exports.getallUsers = async (req, res, next) => {
@@ -53,3 +92,39 @@ module.exports.getallUsers = async (req, res, next) => {
        res.json({ message: "Some thing went wrong", status: false })
    }
   }
+
+//   module.exports.deleteUser =async(req,res)=>{
+//     const userId = req.params.id;
+
+//   try {
+//     const user = await UserModel.findByIdAndUpdate({_id:userId}, { deleted: true });
+
+//     if (!user) {
+//       return res.status(404).json({ message: 'User not found' });
+//     }
+
+//     return res.status(200).json({ message: 'User deleted successfully' });
+//   } catch (error) {
+//     console.error('Error deleting user:', error);
+//     return res.status(500).json({ message: 'Internal server error' });
+//   }
+// }
+
+module.exports.deleteUser = async (req, res) => {
+  const userId = req.params.id;
+  console.log(userId)
+
+  try {
+    // Use deleteOne to remove the user from the database
+    const result = await UserModel.deleteOne({ id:userId});
+
+    if (result.deletedCount === 0) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    return res.status(200).json({ message: 'User deleted successfully' });
+  } catch (error) {
+    console.error('Error deleting user:', error);
+    return res.status(500).json({ message: 'Internal server error' });
+  }
+};
