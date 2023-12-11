@@ -128,3 +128,36 @@ module.exports.deleteUser = async (req, res) => {
     return res.status(500).json({ message: 'Internal server error' });
   }
 };
+
+
+module.exports.addUser = async (req, res) => {
+  console.log(req.body);
+  try {
+    const { firstname, lastname, gender, email, domain, avatar, available } = req.body;
+
+    // Fetch the next available ID
+    const nextUserId = await UserModel.findOne().sort({ id: -1 }).select('id').lean();
+    const id = nextUserId ? nextUserId.id + 1 : 1;
+
+    const newUser = new UserModel({
+      id: id,
+      first_name: firstname,
+      last_name: lastname,
+      gender: gender,
+      email: email,
+      domain: domain,
+      avatar: avatar,
+      available: available
+    });
+
+    // Save the user to the database
+    await newUser.save();
+
+    // Send a response
+    res.json({ status: true, message: 'User created successfully' });
+  } catch (error) {
+    console.error(error);
+    res.status(500).json({ status: false, message: 'Internal server error' });
+  }
+};
+
