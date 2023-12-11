@@ -160,4 +160,22 @@ module.exports.addUser = async (req, res) => {
     res.status(500).json({ status: false, message: 'Internal server error' });
   }
 };
+module.exports.getUserData = async (req, res) => {
+  const id = req.params.id; // Assuming you're extracting the ID from the request parameters
+
+  try {
+    const user = await UserModel.findOne({ id: id });
+
+    if (user) {
+      console.log(user);
+      res.json(user);
+    } else {
+      res.status(404).json({ message: 'User not found' });
+    }
+  } catch (error) {
+    console.error('Error fetching user data:', error);
+    res.status(500).json({ message: 'Internal server error' });
+  }
+};
+
 
